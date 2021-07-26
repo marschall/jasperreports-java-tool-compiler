@@ -3,11 +3,12 @@ package com.github.marschall.jasperreports.javatoolcompiler;
 import static java.util.stream.Collectors.toMap;
 
 import java.io.File;
-import java.io.StringWriter;
+import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticListener;
@@ -18,6 +19,9 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRReport;
 import net.sf.jasperreports.engine.JasperReportsContext;
@@ -25,9 +29,15 @@ import net.sf.jasperreports.engine.design.JRAbstractJavaCompiler;
 import net.sf.jasperreports.engine.design.JRClassGenerator;
 import net.sf.jasperreports.engine.design.JRCompilationSourceCode;
 import net.sf.jasperreports.engine.design.JRCompilationUnit;
+import net.sf.jasperreports.engine.design.JRJdtCompiler;
 import net.sf.jasperreports.engine.design.JRSourceCompileTask;
 
+/**
+ * A compiler for that uses the built in {@link JavaCompiler} to compile reports.
+ */
 public final class JRJavaToolCompiler extends JRAbstractJavaCompiler {
+
+  private static final Log LOG = LogFactory.getLog(JRJdtCompiler.class);
 
   // FIXME #loadClass
 
@@ -59,13 +69,14 @@ public final class JRJavaToolCompiler extends JRAbstractJavaCompiler {
             .collect(toMap(JRCompilationUnit::getName, Function.identity()));
     JavaFileManager jrFileManager = new JRJavaFileManager(standardFileManager, unitsByName);
 
-    // FIXME could also be a logger
-    Writer out = new StringWriter();
+    Writer out = new LoggingWriter(LOG);
     ReportingDiagnosticListener diagnosticListener = new ReportingDiagnosticListener();
     Iterable<String> options = classpath != null ? Arrays.asList("-classpath", classpath) : null;
     Iterable<String> classesToBeProcessed = null;
-    Iterable<? extends JavaFileObject> compilationUnits = Arrays.asList(unitsByName.values());
-    CompilationTask task = this.compiler.getTask(out, jrFileManager, diagnosticListener, options, classesToBeProcessed, null);
+    Iterable<? extends JavaFileObject> compilationUnits = unitsByName.values().stream()
+                                                                .map(JavaFileObjectInputAdapter::new)
+                                                                .collect(Collectors.toList());
+    CompilationTask task = this.compiler.getTask(out, jrFileManager, diagnosticListener, options, classesToBeProcessed, compilationUnits);
     task.call();
 
     String errors = diagnosticListener.getErrors();
@@ -99,6 +110,64 @@ public final class JRJavaToolCompiler extends JRAbstractJavaCompiler {
 
     String getErrors() {
       return this.errors.toString();
+    }
+
+  }
+
+  static final class LoggingWriter extends Writer {
+
+    private final Log log;
+
+    LoggingWriter(Log log) {
+      this.log = log;
+    }
+
+    @Override
+    public void write(char[] cbuf) {
+      this.log.error(new String(cbuf));
+    }
+
+    @Override
+    public void write(char[] cbuf, int off, int len) throws IOException {
+      this.log.error(new String(cbuf, off, len));
+    }
+
+    @Override
+    public void write(String str) {
+      this.log.error(str);
+    }
+
+    @Override
+    public void write(String str, int off, int len) throws IOException {
+      this.log.error(str.substring(off, off + len));
+    }
+
+    @Override
+    public Writer append(CharSequence csq) {
+      this.log.error(csq);
+      return this;
+    }
+
+    @Override
+    public Writer append(CharSequence csq, int start, int end) throws IOException {
+      this.log.error(csq.subSequence(start, end));
+      return this;
+    }
+
+    @Override
+    public Writer append(char c) {
+      this.log.error(c);
+      return this;
+    }
+
+    @Override
+    public void flush() {
+      // ignore
+    }
+
+    @Override
+    public void close() {
+      // ignore
     }
 
   }

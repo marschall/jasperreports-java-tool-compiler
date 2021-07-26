@@ -1,97 +1,105 @@
 package com.github.marschall.jasperreports.javatoolcompiler;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.URI;
 
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.NestingKind;
 import javax.tools.JavaFileObject;
 
 import net.sf.jasperreports.engine.design.JRCompilationUnit;
 
-final class JavaFileObjectOutputAdapter implements JavaFileObject {
-
-  private final JRCompilationUnit jasperCompilationUnit;
-  private final Kind kind;
+/**
+ * An output {@link JavaFileObject} over a {@link JRCompilationUnit}, saves the output using
+ * {@link JRCompilationUnit#setCompileData(java.io.Serializable)}.
+ */
+final class JavaFileObjectOutputAdapter extends AbstractJRJavaFileObject {
 
   JavaFileObjectOutputAdapter(JRCompilationUnit jasperCompilationUnit, Kind kind) {
-    this.jasperCompilationUnit = jasperCompilationUnit;
-    this.kind = kind;
+    super(jasperCompilationUnit, kind);
   }
 
-  @Override
-  public URI toUri() {
-    // TODO Auto-generated method stub
-    return null;
+  JavaFileObjectOutputAdapter(JRCompilationUnit jasperCompilationUnit) {
+    this(jasperCompilationUnit, Kind.CLASS);
   }
 
   @Override
   public String getName() {
-    // TODO Auto-generated method stub
-    return this.jasperCompilationUnit.getName();
+    return this.getCompilationUnitName() + "class";
   }
 
   @Override
-  public InputStream openInputStream() throws IOException {
+  public InputStream openInputStream() {
     throw new IllegalStateException("not for reading");
   }
 
   @Override
-  public OutputStream openOutputStream() throws IOException {
-    // TODO Auto-generated method stub
-    return null;
+  public OutputStream openOutputStream() {
+    return new CompilationUnitOutputStream(this.jasperCompilationUnit);
   }
 
   @Override
-  public Reader openReader(boolean ignoreEncodingErrors) throws IOException {
+  public Reader openReader(boolean ignoreEncodingErrors) {
     throw new IllegalStateException("not for reading");
   }
 
   @Override
-  public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
+  public CharSequence getCharContent(boolean ignoreEncodingErrors) {
     throw new IllegalStateException("not for reading");
   }
 
   @Override
-  public Writer openWriter() throws IOException {
+  public Writer openWriter() {
     throw new IllegalStateException("only binary writing supported");
   }
 
   @Override
-  public long getLastModified() {
-    // TODO Auto-generated method stub
-    return 0;
+  public String toString() {
+    return "output for: " + this.getCompilationUnitName() + ".class";
   }
 
-  @Override
-  public boolean delete() {
-    // TODO Auto-generated method stub
-    return false;
-  }
+  /**
+   * An {@link OutputStream} that calls {@link JRCompilationUnit#setCompileData(java.io.Serializable)} when closed.
+   */
+  static final class CompilationUnitOutputStream extends OutputStream {
 
-  @Override
-  public Kind getKind() {
-    return this.kind;
-  }
+    private final JRCompilationUnit compilationUnit;
 
-  @Override
-  public boolean isNameCompatible(String simpleName, Kind kind) {
-    // TODO Auto-generated method stub
-    return false;
-  }
+    private final ByteArrayOutputStream delegate;
 
-  @Override
-  public NestingKind getNestingKind() {
-    return NestingKind.TOP_LEVEL;
-  }
+    CompilationUnitOutputStream(JRCompilationUnit compilationUnit) {
+      this.compilationUnit = compilationUnit;
+      this.delegate = new ByteArrayOutputStream();
+    }
 
-  @Override
-  public Modifier getAccessLevel() {
-    return Modifier.PUBLIC;
+    @Override
+    public void write(int b) throws IOException {
+      this.delegate.write(b);
+    }
+
+    @Override
+    public void write(byte[] b) throws IOException {
+      this.delegate.write(b);
+    }
+
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+      this.delegate.write(b, off, len);
+    }
+
+    @Override
+    public void flush() throws IOException {
+      this.delegate.flush();
+    }
+
+    @Override
+    public void close() throws IOException {
+      this.delegate.close();
+      this.compilationUnit.setCompileData(this.delegate.toByteArray());
+    }
+
   }
 
 }

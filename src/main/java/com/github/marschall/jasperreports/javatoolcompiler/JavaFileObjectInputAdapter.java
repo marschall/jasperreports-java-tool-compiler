@@ -7,22 +7,18 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
-import java.net.URI;
 
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.NestingKind;
 import javax.tools.JavaFileObject;
 
 import net.sf.jasperreports.engine.design.JRCompilationUnit;
 
-final class JavaFileObjectInputAdapter implements JavaFileObject {
-
-  private final JRCompilationUnit jasperCompilationUnit;
-  private final Kind kind;
+/**
+ * An input {@link JavaFileObject} over a {@link JRCompilationUnit}.
+ */
+final class JavaFileObjectInputAdapter extends AbstractJRJavaFileObject {
 
   JavaFileObjectInputAdapter(JRCompilationUnit jasperCompilationUnit, Kind kind) {
-    this.jasperCompilationUnit = jasperCompilationUnit;
-    this.kind = kind;
+    super(jasperCompilationUnit, kind);
   }
 
   JavaFileObjectInputAdapter(JRCompilationUnit jasperCompilationUnit) {
@@ -30,15 +26,8 @@ final class JavaFileObjectInputAdapter implements JavaFileObject {
   }
 
   @Override
-  public URI toUri() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
   public String getName() {
-    // TODO Auto-generated method stub
-    return this.jasperCompilationUnit.getName();
+    return this.getCompilationUnitName() + ".java";
   }
 
   @Override
@@ -54,7 +43,7 @@ final class JavaFileObjectInputAdapter implements JavaFileObject {
 
   @Override
   public Reader openReader(boolean ignoreEncodingErrors) throws IOException {
-    return new StringReader(this.jasperCompilationUnit.getName());
+    return new StringReader(this.jasperCompilationUnit.getSourceCode());
   }
 
   @Override
@@ -68,36 +57,8 @@ final class JavaFileObjectInputAdapter implements JavaFileObject {
   }
 
   @Override
-  public long getLastModified() {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
-  public boolean delete() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public Kind getKind() {
-    return this.kind;
-  }
-
-  @Override
-  public boolean isNameCompatible(String simpleName, Kind kind) {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public NestingKind getNestingKind() {
-    return NestingKind.TOP_LEVEL;
-  }
-
-  @Override
-  public Modifier getAccessLevel() {
-    return Modifier.PUBLIC;
+  public String toString() {
+    return "input for: " + this.getCompilationUnitName() + ".java";
   }
 
 }
