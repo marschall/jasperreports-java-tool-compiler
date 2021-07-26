@@ -17,6 +17,10 @@ import javax.tools.StandardLocation;
 
 import net.sf.jasperreports.engine.design.JRCompilationUnit;
 
+/**
+ * A file manager that delegate to a {@link JRCompilationUnit} for reading sources and writing classes.
+ * All other operations a delegate the a default {@link JavaFileManager}.
+ */
 final class JRJavaFileManager extends ForwardingJavaFileManager<JavaFileManager> {
 
   private final Map<String, JRCompilationUnit> unitsByName;

@@ -39,8 +39,6 @@ public final class JRJavaToolCompiler extends JRAbstractJavaCompiler {
 
   private static final Log LOG = LogFactory.getLog(JRJdtCompiler.class);
 
-  // FIXME #loadClass
-
   private final JavaCompiler compiler;
 
   public JRJavaToolCompiler(JasperReportsContext jasperReportsContext) {

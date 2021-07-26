@@ -8,6 +8,9 @@ import javax.tools.JavaFileObject;
 
 import net.sf.jasperreports.engine.design.JRCompilationUnit;
 
+/**
+ * Abstract base class for a {@link JavaFileObject} over a {@link JRCompilationUnit}.
+ */
 abstract class AbstractJRJavaFileObject implements JavaFileObject {
 
   protected final JRCompilationUnit jasperCompilationUnit;
@@ -20,8 +23,7 @@ abstract class AbstractJRJavaFileObject implements JavaFileObject {
 
   @Override
   public URI toUri() {
-    // TODO Auto-generated method stub
-    return null;
+    return URI.create("jasper://" + this.getCompilationUnitName());
   }
 
   String getCompilationUnitName() {

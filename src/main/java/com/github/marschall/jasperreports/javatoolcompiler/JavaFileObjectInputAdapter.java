@@ -32,7 +32,7 @@ final class JavaFileObjectInputAdapter extends AbstractJRJavaFileObject {
 
   @Override
   public InputStream openInputStream() throws IOException {
-    // FIXME
+    // not optimized but never clalled
     return new ByteArrayInputStream(this.jasperCompilationUnit.getSourceCode().getBytes());
   }
 

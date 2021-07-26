@@ -2,6 +2,7 @@ package com.github.marschall.jasperreports.javatoolcompiler;
 
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,9 +31,7 @@ class JRJavaFileManagerTests {
   @BeforeEach
   void setUp() {
     JasperReportsContext jrContext = new SimpleJasperReportsContext();
-//    jrContext.setProperty(JRCompiler.COMPILER_CLASS, JRJavaToolCompiler.class.getName());
     jrContext.setProperty(JRCompiler.COMPILER_PREFIX + "java", JRJavaToolCompiler.class.getName());
-
     this.compileManager = JasperCompileManager.getInstance(jrContext);
   }
 
@@ -54,6 +53,7 @@ class JRJavaFileManagerTests {
     }
     byte[] byteCode = outputStream.toByteArray();
     assertNotNull(byteCode);
+    assertTrue(byteCode.length > 0);
   }
 
 }
