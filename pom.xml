@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.marschall</groupId>
   <artifactId>jasperreports-java-tool-compiler</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   
   <name>JR Java Tool Compiler</name>
   <inceptionYear>2021</inceptionYear>
@@ -15,7 +15,7 @@
     <connection>scm:git:git@github.com:marschall/jasperreports-java-tool-compiler.git</connection>
     <developerConnection>scm:git:git@github.com:marschall/jasperreports-java-tool-compiler.git</developerConnection>
     <url>${project.url}</url>
-    <tag>HEAD</tag>
+    <tag>1.0.0</tag>
   </scm>
 
   <dependencyManagement>
