@@ -32,23 +32,23 @@ final class JRJavaFileManager extends ForwardingJavaFileManager<JavaFileManager>
 
   @Override
   public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse) throws IOException {
-    List<JavaFileObject> ownObjects;
+    List<JavaFileObject> ownFiles;
     if (isSourcePath(location) && kinds.contains(Kind.SOURCE)) {
-      ownObjects = this.unitsByName.values().stream()
+      ownFiles = this.unitsByName.values().stream()
               .map(JavaFileObjectInputAdapter::new)
               .collect(toList());
     } else if (isClassOutput(location) && kinds.contains(Kind.CLASS)) {
-        ownObjects = this.unitsByName.values().stream()
+        ownFiles = this.unitsByName.values().stream()
                 .map(JavaFileObjectOutputAdapter::new)
                 .collect(toList());
     } else {
-      ownObjects = List.of();
+      ownFiles = List.of();
     }
     Iterable<JavaFileObject> delegateFiles = super.list(location, packageName, kinds, recurse);
-    if (ownObjects.isEmpty()) {
+    if (ownFiles.isEmpty()) {
       return delegateFiles;
     } else {
-      List<JavaFileObject> merged = new ArrayList<>(ownObjects);
+      List<JavaFileObject> merged = new ArrayList<>(ownFiles);
       for (JavaFileObject toAdd : delegateFiles) {
         merged.add(toAdd);
       }
