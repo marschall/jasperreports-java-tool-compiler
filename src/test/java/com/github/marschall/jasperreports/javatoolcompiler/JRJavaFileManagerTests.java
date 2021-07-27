@@ -19,6 +19,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRReport;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperReportsContext;
 import net.sf.jasperreports.engine.SimpleJasperReportsContext;
@@ -31,7 +32,7 @@ class JRJavaFileManagerTests {
   @BeforeEach
   void setUp() {
     JasperReportsContext jrContext = new SimpleJasperReportsContext();
-    jrContext.setProperty(JRCompiler.COMPILER_PREFIX + "java", JRJavaToolCompiler.class.getName());
+    jrContext.setProperty(JRCompiler.COMPILER_PREFIX + JRReport.LANGUAGE_JAVA, JRJavaToolCompiler.class.getName());
     this.compileManager = JasperCompileManager.getInstance(jrContext);
   }
 
