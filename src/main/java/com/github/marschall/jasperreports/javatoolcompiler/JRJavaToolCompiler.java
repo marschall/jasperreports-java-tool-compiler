@@ -3,8 +3,8 @@ package com.github.marschall.jasperreports.javatoolcompiler;
 import static java.util.stream.Collectors.toMap;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Writer;
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
@@ -36,7 +36,7 @@ import net.sf.jasperreports.engine.design.JRSourceCompileTask;
  */
 public final class JRJavaToolCompiler extends JRAbstractJavaCompiler {
 
-  private static final Log LOG = LogFactory.getLog(JRJavaToolCompiler.class);
+  private static final Log LOG = LogFactory.getLog(MethodHandles.lookup().lookupClass());
 
   private final JavaCompiler compiler;
 
@@ -111,6 +111,9 @@ public final class JRJavaToolCompiler extends JRAbstractJavaCompiler {
 
   }
 
+  /**
+   * A {@link Writer} that writes to a {@link Log}.
+   */
   static final class LoggingWriter extends Writer {
 
     private final Log log;
@@ -125,7 +128,7 @@ public final class JRJavaToolCompiler extends JRAbstractJavaCompiler {
     }
 
     @Override
-    public void write(char[] cbuf, int off, int len) throws IOException {
+    public void write(char[] cbuf, int off, int len) {
       this.log.error(new String(cbuf, off, len));
     }
 
@@ -135,7 +138,7 @@ public final class JRJavaToolCompiler extends JRAbstractJavaCompiler {
     }
 
     @Override
-    public void write(String str, int off, int len) throws IOException {
+    public void write(String str, int off, int len) {
       this.log.error(str.substring(off, off + len));
     }
 
@@ -146,7 +149,7 @@ public final class JRJavaToolCompiler extends JRAbstractJavaCompiler {
     }
 
     @Override
-    public Writer append(CharSequence csq, int start, int end) throws IOException {
+    public Writer append(CharSequence csq, int start, int end) {
       this.log.error(csq.subSequence(start, end));
       return this;
     }

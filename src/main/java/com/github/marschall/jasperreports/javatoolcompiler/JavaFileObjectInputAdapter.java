@@ -1,7 +1,6 @@
 package com.github.marschall.jasperreports.javatoolcompiler;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -31,28 +30,28 @@ final class JavaFileObjectInputAdapter extends AbstractJRJavaFileObject {
   }
 
   @Override
-  public InputStream openInputStream() throws IOException {
+  public InputStream openInputStream() {
     // not optimized but never clalled
     return new ByteArrayInputStream(this.jasperCompilationUnit.getSourceCode().getBytes());
   }
 
   @Override
-  public OutputStream openOutputStream() throws IOException {
+  public OutputStream openOutputStream() {
     throw new IllegalStateException("not for writing");
   }
 
   @Override
-  public Reader openReader(boolean ignoreEncodingErrors) throws IOException {
+  public Reader openReader(boolean ignoreEncodingErrors) {
     return new StringReader(this.jasperCompilationUnit.getSourceCode());
   }
 
   @Override
-  public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
+  public CharSequence getCharContent(boolean ignoreEncodingErrors) {
     return this.jasperCompilationUnit.getSourceCode();
   }
 
   @Override
-  public Writer openWriter() throws IOException {
+  public Writer openWriter() {
     throw new IllegalStateException("not for writing");
   }
 

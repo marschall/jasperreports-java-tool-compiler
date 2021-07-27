@@ -14,7 +14,7 @@ import net.sf.jasperreports.engine.design.JRCompilationUnit;
 abstract class AbstractJRJavaFileObject implements JavaFileObject {
 
   protected final JRCompilationUnit jasperCompilationUnit;
-  protected final Kind kind;
+  private final Kind kind;
 
   AbstractJRJavaFileObject(JRCompilationUnit jasperCompilationUnit, Kind kind) {
     this.jasperCompilationUnit = jasperCompilationUnit;
