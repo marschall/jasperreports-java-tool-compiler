@@ -29,7 +29,6 @@ import net.sf.jasperreports.engine.design.JRAbstractJavaCompiler;
 import net.sf.jasperreports.engine.design.JRClassGenerator;
 import net.sf.jasperreports.engine.design.JRCompilationSourceCode;
 import net.sf.jasperreports.engine.design.JRCompilationUnit;
-import net.sf.jasperreports.engine.design.JRJdtCompiler;
 import net.sf.jasperreports.engine.design.JRSourceCompileTask;
 
 /**
@@ -37,7 +36,7 @@ import net.sf.jasperreports.engine.design.JRSourceCompileTask;
  */
 public final class JRJavaToolCompiler extends JRAbstractJavaCompiler {
 
-  private static final Log LOG = LogFactory.getLog(JRJdtCompiler.class);
+  private static final Log LOG = LogFactory.getLog(JRJavaToolCompiler.class);
 
   private final JavaCompiler compiler;
 
