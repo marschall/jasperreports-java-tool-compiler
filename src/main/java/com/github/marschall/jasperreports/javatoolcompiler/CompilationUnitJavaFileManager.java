@@ -21,11 +21,11 @@ import net.sf.jasperreports.engine.design.JRCompilationUnit;
  * A file manager that delegate to a {@link JRCompilationUnit} for reading sources and writing classes.
  * All other operations a delegate the a default {@link JavaFileManager}.
  */
-final class JRJavaFileManager extends ForwardingJavaFileManager<JavaFileManager> {
+final class CompilationUnitJavaFileManager extends ForwardingJavaFileManager<JavaFileManager> {
 
   private final Map<String, JRCompilationUnit> unitsByName;
 
-  JRJavaFileManager(JavaFileManager delegate, Map<String, JRCompilationUnit> unitsByName) {
+  CompilationUnitJavaFileManager(JavaFileManager delegate, Map<String, JRCompilationUnit> unitsByName) {
     super(delegate);
     this.unitsByName = unitsByName;
   }
@@ -34,13 +34,17 @@ final class JRJavaFileManager extends ForwardingJavaFileManager<JavaFileManager>
   public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse) throws IOException {
     List<JavaFileObject> ownFiles;
     if (isSourcePath(location) && kinds.contains(Kind.SOURCE)) {
+      //@formatter:off
       ownFiles = this.unitsByName.values().stream()
-              .map(JavaFileObjectInputAdapter::new)
-              .collect(toList());
+                                          .map(JavaFileObjectInputAdapter::new)
+                                          .collect(toList());
+      //@formatter:on
     } else if (isClassOutput(location) && kinds.contains(Kind.CLASS)) {
+      //@formatter:off
         ownFiles = this.unitsByName.values().stream()
-                .map(JavaFileObjectOutputAdapter::new)
-                .collect(toList());
+                                            .map(JavaFileObjectOutputAdapter::new)
+                                            .collect(toList());
+        //@formatter:on
     } else {
       ownFiles = List.of();
     }

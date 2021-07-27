@@ -1,5 +1,6 @@
 package com.github.marschall.jasperreports.javatoolcompiler;
 
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 import java.io.File;
@@ -7,7 +8,6 @@ import java.io.Writer;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.tools.Diagnostic;
@@ -16,7 +16,6 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import org.apache.commons.logging.Log;
@@ -61,18 +60,22 @@ public final class JRJavaToolCompiler extends JRAbstractJavaCompiler {
   @Override
   protected String compileUnits(JRCompilationUnit[] units, String classpath, File tempDirFile) throws JRException {
 
-    StandardJavaFileManager standardFileManager = this.compiler.getStandardFileManager(null, null, null);
+    JavaFileManager standardFileManager = this.compiler.getStandardFileManager(null, null, null);
+    //@formatter:off
     Map<String, JRCompilationUnit> unitsByName = Arrays.stream(units)
-            .collect(toMap(JRCompilationUnit::getName, Function.identity()));
-    JavaFileManager jrFileManager = new JRJavaFileManager(standardFileManager, unitsByName);
+                                                       .collect(toMap(JRCompilationUnit::getName, identity()));
+    //@formatter:on
+    JavaFileManager jrFileManager = new CompilationUnitJavaFileManager(standardFileManager, unitsByName);
 
     Writer out = new LoggingWriter(LOG);
     ReportingDiagnosticListener diagnosticListener = new ReportingDiagnosticListener();
     Iterable<String> options = classpath != null ? Arrays.asList("-classpath", classpath) : null;
     Iterable<String> classesToBeProcessed = null;
+    //@formatter:off
     Iterable<? extends JavaFileObject> compilationUnits = unitsByName.values().stream()
-                                                                .map(JavaFileObjectInputAdapter::new)
-                                                                .collect(Collectors.toList());
+                                                                              .map(JavaFileObjectInputAdapter::new)
+                                                                              .collect(Collectors.toList());
+    //@formatter:on
     CompilationTask task = this.compiler.getTask(out, jrFileManager, diagnosticListener, options, classesToBeProcessed, compilationUnits);
     task.call();
 
