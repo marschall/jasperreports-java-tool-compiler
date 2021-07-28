@@ -60,6 +60,7 @@ public final class JRJavaToolCompiler extends JRAbstractJavaCompiler {
   @Override
   protected String compileUnits(JRCompilationUnit[] units, String classpath, File tempDirFile) throws JRException {
 
+    // not guaranteed to be thread-safe so we create a new instance
     JavaFileManager standardFileManager = this.compiler.getStandardFileManager(null, null, null);
     //@formatter:off
     Map<String, JRCompilationUnit> unitsByName = Arrays.stream(units)
@@ -68,12 +69,12 @@ public final class JRJavaToolCompiler extends JRAbstractJavaCompiler {
     JavaFileManager jrFileManager = new CompilationUnitJavaFileManager(standardFileManager, unitsByName);
 
     Writer out = new LoggingWriter(LOG);
-    ReportingDiagnosticListener diagnosticListener = new ReportingDiagnosticListener();
+    ReportingDiagnosticListener diagnosticListener = new ReportingDiagnosticListener(LOG);
     Iterable<String> options = classpath != null ? Arrays.asList("-classpath", classpath) : null;
     Iterable<String> classesToBeProcessed = null;
     //@formatter:off
     Iterable<? extends JavaFileObject> compilationUnits = unitsByName.values().stream()
-                                                                              .map(JavaFileObjectInputAdapter::new)
+                                                                              .map(InputCompilationUnitJavaFileObject::new)
                                                                               .collect(Collectors.toList());
     //@formatter:on
     CompilationTask task = this.compiler.getTask(out, jrFileManager, diagnosticListener, options, classesToBeProcessed, compilationUnits);
@@ -92,18 +93,36 @@ public final class JRJavaToolCompiler extends JRAbstractJavaCompiler {
     return unitName + ".java";
   }
 
+  /**
+   * Collects error into a {@link String} that can be retrieved. Logs warnings and notes.
+   */
   static final class ReportingDiagnosticListener implements DiagnosticListener<JavaFileObject> {
+
+    private final Log log;
 
     private final StringBuilder errors;
 
-    ReportingDiagnosticListener() {
+    ReportingDiagnosticListener(Log log) {
+      this.log = log;
       this.errors = new StringBuilder();
     }
 
     @Override
     public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
-      if (diagnostic.getKind() == javax.tools.Diagnostic.Kind.ERROR) {
-        this.errors.append(diagnostic.getMessage(null));
+      switch (diagnostic.getKind()) {
+        case ERROR:
+          if (this.errors.length() > 0) {
+            this.errors.append("\n");
+          }
+          this.errors.append(diagnostic.getMessage(null));
+          break;
+        case WARNING:
+        case MANDATORY_WARNING:
+          this.log.warn(diagnostic.getMessage(null));
+        case NOTE:
+          this.log.info(diagnostic.getMessage(null));
+        default:
+          // ignore
       }
 
     }

@@ -11,12 +11,12 @@ import net.sf.jasperreports.engine.design.JRCompilationUnit;
 /**
  * Abstract base class for a {@link JavaFileObject} over a {@link JRCompilationUnit}.
  */
-abstract class AbstractJRJavaFileObject implements JavaFileObject {
+abstract class AbstractCompilationUnitJavaFileObject implements JavaFileObject {
 
   protected final JRCompilationUnit jasperCompilationUnit;
   private final Kind kind;
 
-  AbstractJRJavaFileObject(JRCompilationUnit jasperCompilationUnit, Kind kind) {
+  AbstractCompilationUnitJavaFileObject(JRCompilationUnit jasperCompilationUnit, Kind kind) {
     this.jasperCompilationUnit = jasperCompilationUnit;
     this.kind = kind;
   }

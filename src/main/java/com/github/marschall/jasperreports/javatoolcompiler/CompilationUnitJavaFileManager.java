@@ -36,13 +36,13 @@ final class CompilationUnitJavaFileManager extends ForwardingJavaFileManager<Jav
     if (isSourcePath(location) && kinds.contains(Kind.SOURCE)) {
       //@formatter:off
       ownFiles = this.unitsByName.values().stream()
-                                          .map(JavaFileObjectInputAdapter::new)
+                                          .map(InputCompilationUnitJavaFileObject::new)
                                           .collect(toList());
       //@formatter:on
     } else if (isClassOutput(location) && kinds.contains(Kind.CLASS)) {
       //@formatter:off
         ownFiles = this.unitsByName.values().stream()
-                                            .map(JavaFileObjectOutputAdapter::new)
+                                            .map(OutputCompilationUnitJavaFileObject::new)
                                             .collect(toList());
         //@formatter:on
     } else {
@@ -63,8 +63,8 @@ final class CompilationUnitJavaFileManager extends ForwardingJavaFileManager<Jav
   @Override
   public String inferBinaryName(Location location, JavaFileObject file) {
     if (this.isSourcePathOrClassOutput(location)) {
-      if (file instanceof AbstractJRJavaFileObject) {
-        AbstractJRJavaFileObject jrFileObject = (AbstractJRJavaFileObject) file;
+      if (file instanceof AbstractCompilationUnitJavaFileObject) {
+        AbstractCompilationUnitJavaFileObject jrFileObject = (AbstractCompilationUnitJavaFileObject) file;
         return jrFileObject.getCompilationUnitName();
       }
     }
@@ -73,15 +73,15 @@ final class CompilationUnitJavaFileManager extends ForwardingJavaFileManager<Jav
 
   @Override
   public boolean isSameFile(FileObject a, FileObject b) {
-    if (a instanceof AbstractJRJavaFileObject) {
-      if (!(b instanceof AbstractJRJavaFileObject)) {
+    if (a instanceof AbstractCompilationUnitJavaFileObject) {
+      if (!(b instanceof AbstractCompilationUnitJavaFileObject)) {
         return false;
       }
-      AbstractJRJavaFileObject first = (AbstractJRJavaFileObject) a;
-      AbstractJRJavaFileObject second = (AbstractJRJavaFileObject) b;
+      AbstractCompilationUnitJavaFileObject first = (AbstractCompilationUnitJavaFileObject) a;
+      AbstractCompilationUnitJavaFileObject second = (AbstractCompilationUnitJavaFileObject) b;
       return (first.getKind() == second.getKind())
                 && first.getCompilationUnitName().equals(second.getCompilationUnitName());
-    } else if (b instanceof AbstractJRJavaFileObject) {
+    } else if (b instanceof AbstractCompilationUnitJavaFileObject) {
       return false;
     }
     return super.isSameFile(a, b);
@@ -101,7 +101,7 @@ final class CompilationUnitJavaFileManager extends ForwardingJavaFileManager<Jav
       if (kind == Kind.SOURCE) {
         JRCompilationUnit compilationUnit = this.unitsByName.get(className);
         if (compilationUnit != null) {
-          return new JavaFileObjectInputAdapter(compilationUnit, kind);
+          return new InputCompilationUnitJavaFileObject(compilationUnit, kind);
         }
       }
     }
@@ -114,7 +114,7 @@ final class CompilationUnitJavaFileManager extends ForwardingJavaFileManager<Jav
       if (kind == Kind.CLASS) {
         JRCompilationUnit compilationUnit = this.unitsByName.get(className);
         if (compilationUnit != null) {
-          return new JavaFileObjectOutputAdapter(compilationUnit, kind);
+          return new OutputCompilationUnitJavaFileObject(compilationUnit, kind);
         }
       }
     }
@@ -126,7 +126,7 @@ final class CompilationUnitJavaFileManager extends ForwardingJavaFileManager<Jav
     if (isSourcePath(location) && packageName.equals("")) {
       JRCompilationUnit compilationUnit = this.unitsByName.get(relativeName);
       if (compilationUnit != null) {
-        return new JavaFileObjectInputAdapter(compilationUnit);
+        return new InputCompilationUnitJavaFileObject(compilationUnit);
       }
     }
     return super.getFileForInput(location, packageName, relativeName);
@@ -137,7 +137,7 @@ final class CompilationUnitJavaFileManager extends ForwardingJavaFileManager<Jav
     if (isClassOutput(location) && packageName.equals("")) {
       JRCompilationUnit compilationUnit = this.unitsByName.get(relativeName);
       if (compilationUnit != null) {
-        return new JavaFileObjectOutputAdapter(compilationUnit);
+        return new OutputCompilationUnitJavaFileObject(compilationUnit);
       }
     }
     return super.getFileForOutput(location, packageName, relativeName, sibling);
@@ -146,8 +146,8 @@ final class CompilationUnitJavaFileManager extends ForwardingJavaFileManager<Jav
   @Override
   public boolean contains(Location location, FileObject file) throws IOException {
     if (this.isSourcePathOrClassOutput(location)) {
-      if (file instanceof AbstractJRJavaFileObject) {
-        AbstractJRJavaFileObject jrFileObject = (AbstractJRJavaFileObject) file;
+      if (file instanceof AbstractCompilationUnitJavaFileObject) {
+        AbstractCompilationUnitJavaFileObject jrFileObject = (AbstractCompilationUnitJavaFileObject) file;
         if (this.unitsByName.containsKey(jrFileObject.getCompilationUnitName())) {
           return true;
         }

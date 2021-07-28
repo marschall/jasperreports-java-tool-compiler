@@ -14,13 +14,13 @@ import net.sf.jasperreports.engine.design.JRCompilationUnit;
 /**
  * An input {@link JavaFileObject} over a {@link JRCompilationUnit}.
  */
-final class JavaFileObjectInputAdapter extends AbstractJRJavaFileObject {
+final class InputCompilationUnitJavaFileObject extends AbstractCompilationUnitJavaFileObject {
 
-  JavaFileObjectInputAdapter(JRCompilationUnit jasperCompilationUnit, Kind kind) {
+  InputCompilationUnitJavaFileObject(JRCompilationUnit jasperCompilationUnit, Kind kind) {
     super(jasperCompilationUnit, kind);
   }
 
-  JavaFileObjectInputAdapter(JRCompilationUnit jasperCompilationUnit) {
+  InputCompilationUnitJavaFileObject(JRCompilationUnit jasperCompilationUnit) {
     this(jasperCompilationUnit, Kind.SOURCE);
   }
 

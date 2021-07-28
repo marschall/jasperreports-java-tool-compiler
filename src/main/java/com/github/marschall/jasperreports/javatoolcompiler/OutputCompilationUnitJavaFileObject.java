@@ -15,13 +15,13 @@ import net.sf.jasperreports.engine.design.JRCompilationUnit;
  * An output {@link JavaFileObject} over a {@link JRCompilationUnit}, saves the output using
  * {@link JRCompilationUnit#setCompileData(java.io.Serializable)}.
  */
-final class JavaFileObjectOutputAdapter extends AbstractJRJavaFileObject {
+final class OutputCompilationUnitJavaFileObject extends AbstractCompilationUnitJavaFileObject {
 
-  JavaFileObjectOutputAdapter(JRCompilationUnit jasperCompilationUnit, Kind kind) {
+  OutputCompilationUnitJavaFileObject(JRCompilationUnit jasperCompilationUnit, Kind kind) {
     super(jasperCompilationUnit, kind);
   }
 
-  JavaFileObjectOutputAdapter(JRCompilationUnit jasperCompilationUnit) {
+  OutputCompilationUnitJavaFileObject(JRCompilationUnit jasperCompilationUnit) {
     this(jasperCompilationUnit, Kind.CLASS);
   }
 
