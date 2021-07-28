@@ -27,7 +27,7 @@ final class OutputCompilationUnitJavaFileObject extends AbstractCompilationUnitJ
 
   @Override
   public String getName() {
-    return this.getCompilationUnitName() + "class";
+    return this.getCompilationUnitName() + ".class";
   }
 
   @Override
@@ -57,7 +57,7 @@ final class OutputCompilationUnitJavaFileObject extends AbstractCompilationUnitJ
 
   @Override
   public String toString() {
-    return "output for: " + this.getCompilationUnitName() + ".class";
+    return "output for: " + this.getName();
   }
 
   /**
