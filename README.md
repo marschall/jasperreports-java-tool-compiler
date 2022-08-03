@@ -18,7 +18,7 @@ Usage
 
 ```java
 JasperReportsContext jrContext = new SimpleJasperReportsContext();
-// alternatively the deprecated JRCompiler.COMPILER_CLASS works as wll
+// alternatively the deprecated JRCompiler.COMPILER_CLASS works as well
 jrContext.setProperty(JRCompiler.COMPILER_PREFIX + JRReport.LANGUAGE_JAVA, JRJavaToolCompiler.class.getName());
 var compileManager = JasperCompileManager.getInstance(jrContext);
 ```
