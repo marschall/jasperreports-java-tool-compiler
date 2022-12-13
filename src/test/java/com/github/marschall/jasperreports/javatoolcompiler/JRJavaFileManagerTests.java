@@ -2,10 +2,8 @@ package com.github.marschall.jasperreports.javatoolcompiler;
 
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -21,6 +19,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRReport;
 import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.JasperReportsContext;
 import net.sf.jasperreports.engine.SimpleJasperReportsContext;
 import net.sf.jasperreports.engine.design.JRCompiler;
@@ -47,14 +46,12 @@ class JRJavaFileManagerTests {
 
   @ParameterizedTest
   @MethodSource("testReports")
-  void compileReport(Path reportFile) throws IOException, JRException {
-    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+  void compileReport(Path reportFile) throws IOException, JRException, IllegalAccessException {
+    JasperReport report;
     try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(reportFile))) {
-      this.compileManager.compileToStream(inputStream, outputStream);
+      report = this.compileManager.compile(inputStream);
     }
-    byte[] byteCode = outputStream.toByteArray();
-    assertNotNull(byteCode);
-    assertTrue(byteCode.length > 0);
+    assertNotNull(report);
   }
 
 }
